@@ -1,0 +1,19 @@
+/*
+  Goal: This code reads the value from a Light Dependent Resistor (LDR) and moves a servo motor based on the light intensity.
+  Theme: Analog input controlling a servo motor's position based on light levels.
+  The LDR detects light levels, which are mapped to a servo position between 0 to 180 degrees.
+*/
+#include <Servo.h>  // Includes the Servo library to control the servo motor
+Servo myServo;  // Create a Servo object to control the servo motor
+void setup() {
+  myServo.attach(9);  // Attach the servo to pin 9
+  Serial.begin(9600);  // Start serial communication for debugging and displaying LDR value
+}
+void loop() {
+  int value = analogRead(A0);  // Read the analog value from the LDR connected to pin A0
+  Serial.println(value);  // Print the raw value from the LDR to the Serial Monitor for debugging
+  int position = map(value, 70, 715, 0, 180);  // Map the LDR value (range 70-715) to servo angle (0-180 degrees)
+  myServo.write(position);  // Move the servo to the calculated position based on the LDR value
+  delay(150);  // Add a short delay to ensure the servo movement is stable
+}
+
