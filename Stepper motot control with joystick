@@ -1,0 +1,41 @@
+
+/*
+  Goal: This code uses a joystick to control the speed and direction of a stepper motor.
+  Theme: Analog input controlling motor speed and direction using joystick input.
+  The joystick position is read, and the stepper motor moves forward or backward based on the joystick's value.
+*/
+#include <Stepper.h>  // Includes the Stepper library to control the stepper motor
+#define STEPS 32  // Define the number of steps per revolution for the stepper motor
+#define IN1 11     // Define the pin for controlling stepper motor input 1
+#define IN2 10     // Define the pin for controlling stepper motor input 2
+#define IN3 9      // Define the pin for controlling stepper motor input 3
+#define IN4 8      // Define the pin for controlling stepper motor input 4
+Stepper stepper(STEPS, IN4, IN2, IN3, IN1);  // Initialize the stepper motor with 32 steps and control pins
+#define joystick A0  // Define the analog pin connected to the joystick's X-axis
+#define JOYSTICK_DEADZONE_LOW 485  // Define the lower range for the joystick's "deadzone"
+#define JOYSTICK_DEADZONE_HIGH 535 // Define the upper range for the joystick's "deadzone"
+void setup() {
+  Serial.begin(9600);  // Start serial communication to display joystick values for debugging
+}
+void loop() {
+  int val = analogRead(joystick);  // Read the joystick value from the analog pin (0 to 1023)
+  Serial.println(val);  // Print the joystick value to the Serial Monitor for debugging
+  // Check if the joystick is in the "deadzone" (middle position)
+  if (val > JOYSTICK_DEADZONE_LOW && val < JOYSTICK_DEADZONE_HIGH) {
+    stepper.setSpeed(0);  // Stop the motor if the joystick is in the deadzone
+  }
+  // If joystick is pushed to the right (greater than deadzone high)
+  else if (val >= JOYSTICK_DEADZONE_HIGH) {
+    int speed = map(val, JOYSTICK_DEADZONE_HIGH, 1023, 5, 500);  // Map joystick value to motor speed
+    stepper.setSpeed(speed);  // Set motor speed based on joystick position
+    stepper.step(1);  // Move the motor 1 step forward (clockwise)
+  }
+  // If joystick is pushed to the left (less than deadzone low)
+  else if (val <= JOYSTICK_DEADZONE_LOW) {
+    int speed = map(val, 0, JOYSTICK_DEADZONE_LOW, 5, 500);  // Map joystick value to motor speed for backward movement
+    stepper.setSpeed(speed);  // Set motor speed for backward movement
+    stepper.step(-1);  // Move the motor 1 step backward (counterclockwise)
+  }
+  
+  delay(10);  // Delay to slow down the loop and give time for the motor to respond
+}
