@@ -1,0 +1,44 @@
+/*
+  Goal: This code uses an analog input from a potentiometer to control the position of a servo motor.
+  Theme: Analog input controlling servo position (motor control using joystick input).
+  The potentiometer's position (voltage) is read by the Arduino, and the servo's angle is adjusted accordingly.
+  The potentiometer value is also displayed in raw value, angle (in degrees), and corresponding voltage on the Serial Monitor.
+  by Michal Rinott <http://people.interaction-ivrea.it/m.rinott>
+  modified on 8 Nov 2013
+  by Scott Fitzgerald
+  http://www.arduino.cc/en/Tutorial/Knob
+*/
+#include <Servo.h> // Includes the Servo library to control servo motors
+Servo myservo;  // Create a Servo object to control a servo motor
+int potpin = A0;  // Define the analog pin (A0) connected to the potentiometer
+int val;           // Variable to store the value read from the potentiometer
+void setup() {
+  myservo.attach(9);  // Attach the servo to pin 9 (the pin controlling the servo motor)
+  Serial.begin(9600);  // Start serial communication at a baud rate of 9600 for debugging and printing to the Serial Monitor
+}
+void loop() {
+  val = analogRead(potpin);  // Read the analog value from the potentiometer (range 0-1023)
+  
+  // Map the potentiometer value (0-1023) to a range of 0-180 (the servo's angle range)
+  int angle = map(val, 0, 1023, 0, 180); 
+  
+  myservo.write(angle);  // Move the servo to the mapped angle (in degrees)
+  
+  // Map the potentiometer value (0-1023) to a corresponding voltage (0-500), then convert it to float (0-5V)
+  int volt = map(val, 0, 1023, 0, 500); 
+  float voltage = volt / 100.0;  // Convert the mapped value into voltage (0-5V)
+  // Print the raw potentiometer value to the Serial Monitor
+  Serial.print("bitvalue = ");
+  Serial.print(val);  // Print the raw potentiometer value (0 to 1023)
+  Serial.print("\t");  // Tab space for better formatting
+  
+  // Print the angle of the servo to the Serial Monitor
+  Serial.print("angle = ");
+  Serial.print(angle);  // Print the angle (in degrees) to which the servo is positioned
+  Serial.print("\t");  // Tab space for better formatting
+  
+  // Print the voltage corresponding to the potentiometer's position
+  Serial.print("voltage = ");
+  Serial.println(voltage);  // Print the voltage (in Volts)
+  delay(15);  // Wait for 15 milliseconds to give the servo time to reach the target position
+}
